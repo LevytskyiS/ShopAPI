@@ -41,8 +41,8 @@ This application is designed for importing supplier products and their attribute
 ## Installation
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/yourproject.git
-    cd yourproject
+    git clone https://github.com/LevytskyiS/ShopAPI.git
+    cd ShopAPI
     ```
 
 2. Create a virtual environment and activate it:
@@ -53,6 +53,7 @@ This application is designed for importing supplier products and their attribute
 
 3. Install the dependencies:
     ```bash
+    cd store
     pip install -r requirements.txt
     ```
 
@@ -71,25 +72,25 @@ This application is designed for importing supplier products and their attribute
     PASSWORD=password
     HOST=host
     PORT=1234
-    <!-- Supplier`s API -->
+    <!-- Supplier`s API / For certain reasons the name of the supplier and it`s API will not be provided -->
     STOCK_URL=products_url
     TOKEN_URL=token_url
     ```
 
-5. Apply migrations and create a superuser:
+5. Run docker containers
+    ```
+    docker-compose up -d
+    ```
+
+6. Apply migrations and create a superuser (Switch to the interactive mode of the 'webapp' application container and apply the migrations; the username and the password must be the same as you defined in the .env file):
     ```bash
     python manage.py migrate
     python manage.py createsuperuser
     ```
 
-6. Run the development server:
-    ```bash
-    python manage.py runserver
-    ```
-
 ## Usage
 - Access the admin panel at `http://127.0.0.1:8000/admin/`
-- Access the API documentation at `http://127.0.0.1:8000/swagger/`
+- Access the API documentation at `http://127.0.0.1:8000/api/v1/swagger/`
 
 ## Running Tests
 To run tests, use the following command:
