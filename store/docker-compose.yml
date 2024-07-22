@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: ${NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/var/lib/postgresql/data 
+
+  broker:
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+
+  webapp:
+    restart: always
+    build:
+      context: ./
+    ports: 
+      - "8000:8000"
+    depends_on:
+      - postgres
+    command: ["bash", "-c", "sleep 30 && python manage.py runserver 0.0.0.0:8000"]
+
+  worker:
+    restart: always
+    build:
+      context: ./
+    command: celery -A store worker -l info
+
+
+  flower:
+    build:
+      context: ./
+    restart: always
+    depends_on:
+      - worker
+    ports: 
+      - "5555:5555"
+    command: celery -A store flower -l info --persistent=True
+
+  beat:
+    restart: always
+    build:
+      context: ./
+    depends_on:
+      - flower
+    command: celery -A store beat -l info
