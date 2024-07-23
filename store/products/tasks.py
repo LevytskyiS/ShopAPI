@@ -107,6 +107,7 @@ def get_stock(token):
 
 
 def update_current_stock() -> list:
+    checked_items = []
     updated = []
     dynamic_stock = []
     token = get_token()
@@ -115,16 +116,22 @@ def update_current_stock() -> list:
     stock_data = load_stock_data()
 
     for data in stock_data:
-        code = data.get("productSizeCode", None)
-        quantity = data.get("quantity", None)
-        date = data.get("date", None)
+        code = data.get("productSizeCode")
+        quantity = data.get("quantity")
+        date = data.get("date")
 
         datetime_obj = parser.parse(date)
         datetime_obj = datetime_obj.astimezone(timezone.utc)
-        if datetime_obj > datetime.now(timezone.utc):
-            continue
-
         item = Nomenclature.objects.filter(code=code).first()
+
+        if datetime_obj > datetime.now(timezone.utc) and item:
+            item.quantity = 0
+            updated.append(item)
+            stock_obj = NomenclatureStock(nomenclature=item, quantity=0)
+            if code not in checked_items:
+                dynamic_stock.append(stock_obj)
+                checked_items.append(code)
+            continue
 
         if code and quantity and date and item:
             item.quantity = quantity
