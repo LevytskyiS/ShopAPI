@@ -16,14 +16,14 @@ class UpdateNomenclatureStockTest(TestCase):
             nomenclature_size=self.mock_size,
         )
 
-    # def test_import_stock(self):
-    #     Nomenclature.objects.create(
-    #         code="12345698",
-    #         ean="12345",
-    #         product_variant=self.mock_product_variant,
-    #         nomenclature_size=self.mock_size,
-    #     )
-    #     result = update_current_stock()
-    #     updated_item = Nomenclature.objects.get(code="1234567")
-    #     self.assertEqual(result, 204)
-    #     self.assertEqual(updated_item.quantity, 122244)
+    def test_import_stock(self):
+        Nomenclature.objects.create(
+            code="1290115",
+            ean="12345",
+            product_variant=self.mock_product_variant,
+            nomenclature_size=self.mock_size,
+        )
+        result = update_current_stock()
+        updated_item = Nomenclature.objects.get(code="1290115")
+        self.assertEqual(result, 204)
+        self.assertEqual(updated_item.quantity, 116635)

@@ -72,7 +72,6 @@ def get_products(token):
     content = reponse.json()
 
     with open(products, "w", encoding="utf-8") as fh:
-        print("updated products")
         json.dump(content, fh, indent=4)
 
 
@@ -106,44 +105,87 @@ def get_stock(token):
         json.dump(content, fh, indent=4)
 
 
+def update_nomenclature(code, quantity):
+    item = Nomenclature.objects.filter(code=code).first()
+    if not item:
+        return False
+    item.quantity = quantity
+    return item
+
+
+def create_nomenclature_stock(code, quantity):
+    item = Nomenclature.objects.filter(code=code).first()
+    if not item:
+        return False
+    return NomenclatureStock(nomenclature=item, quantity=quantity)
+
+
 def update_current_stock() -> list:
-    checked_items = []
-    updated = []
-    dynamic_stock = []
+    update_nomenclatures = []
+    update_nomenclatures_stock = []
+
+    current_date = datetime.now(timezone.utc)
+
     token = get_token()
     get_stock(token)
-
     stock_data = load_stock_data()
 
-    for data in stock_data:
-        code = data.get("productSizeCode")
-        quantity = data.get("quantity")
-        date = data.get("date")
+    imported_nomenclatures = set([code.get("productSizeCode") for code in stock_data])
+    db_nomenclatures = [obj for obj in Nomenclature.objects.all()]
 
-        datetime_obj = parser.parse(date)
-        datetime_obj = datetime_obj.astimezone(timezone.utc)
-        item = Nomenclature.objects.filter(code=code).first()
-
-        if datetime_obj > datetime.now(timezone.utc) and item:
+    for item in db_nomenclatures:
+        if item.code not in imported_nomenclatures:
             item.quantity = 0
-            updated.append(item)
-            stock_obj = NomenclatureStock(nomenclature=item, quantity=0)
-            if code not in checked_items:
-                dynamic_stock.append(stock_obj)
-                checked_items.append(code)
-            continue
+            update_nomenclatures.append(item)
+            update_nomenclatures_stock.append(
+                NomenclatureStock(nomenclature=item, quantity=0)
+            )
 
-        if code and quantity and date and item:
-            item.quantity = quantity
-            updated.append(item)
-            stock_obj = NomenclatureStock(nomenclature=item, quantity=quantity)
-            dynamic_stock.append(stock_obj)
+    nomenclature_dict = {}
+
+    for nomenclature in stock_data:
+        product_code = nomenclature.get("productSizeCode")
+        object_date = parser.parse(nomenclature["date"]).astimezone(timezone.utc)
+
+        if product_code not in nomenclature_dict:
+            nomenclature_dict[product_code] = {"found_today": False, "quantity": 0}
+
+        if object_date < current_date:
+            nomenclature_dict[product_code] = {
+                "found_today": True,
+                "quantity": nomenclature.get("quantity"),
+            }
+
+    for product_code, data in nomenclature_dict.items():
+        if data["found_today"]:
+            updated_item = update_nomenclature(product_code, data["quantity"])
+            updated_item_stock = create_nomenclature_stock(
+                product_code, data["quantity"]
+            )
+
+            if updated_item:
+                update_nomenclatures.append(updated_item)
+            if updated_item_stock:
+                update_nomenclatures_stock.append(updated_item_stock)
+        else:
+            if product_code not in [
+                item.code for item in update_nomenclatures
+            ] and product_code not in [
+                item.nomenclature for item in update_nomenclatures_stock
+            ]:
+                updated_item = update_nomenclature(product_code, 0)
+                updated_item_stock = create_nomenclature_stock(product_code, 0)
+
+                if updated_item:
+                    update_nomenclatures.append(updated_item)
+                if updated_item_stock:
+                    update_nomenclatures_stock.append(updated_item_stock)
 
     with transaction.atomic():
-        Nomenclature.objects.bulk_update(updated, ["quantity"])
+        Nomenclature.objects.bulk_update(update_nomenclatures, ["quantity"])
 
     with transaction.atomic():
-        NomenclatureStock.objects.bulk_create(dynamic_stock)
+        NomenclatureStock.objects.bulk_create(update_nomenclatures_stock)
 
     return status.HTTP_204_NO_CONTENT
 
