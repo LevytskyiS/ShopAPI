@@ -447,10 +447,11 @@ class ColorSerializer(CodeNameSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     code = serializers.CharField(source="product_variant_code", required=True)
     colorCode = serializers.CharField(required=True, write_only=True)
-    color = serializers.CharField(source="base_color.code", read_only=True)
+    color = ColorSerializer(source="base_color", read_only=True)
 
     class Meta:
         model = ProductVariant
+        depth = 1
         fields = [
             "id",
             "code",

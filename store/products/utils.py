@@ -45,7 +45,7 @@ model_serializers_mapping = {
     "Description": DescriptionSerializer,
     "Product": ProductSerializer,
     "Color": ColorSerializer,
-    "Variant": ProductVariantSerializer,
+    "ProductVariant": ProductVariantSerializer,
     "Size": SizeSerializer,
     "Nomenclature": NomenclatureSerializer,
 }

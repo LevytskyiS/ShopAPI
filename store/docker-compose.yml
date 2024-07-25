@@ -31,6 +31,8 @@ services:
     restart: always
     build:
       context: ./
+    volumes:
+      - ./import:/app/import
     command: celery -A store worker -l info
 
 
