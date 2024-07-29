@@ -247,7 +247,7 @@ def get_products_variants(data: list) -> dict:
                     }
                 )
     if product_variants:
-        return {"Variant": product_variants}
+        return {"ProductVariant": product_variants}
 
 
 def get_sizes(data: list) -> dict:
