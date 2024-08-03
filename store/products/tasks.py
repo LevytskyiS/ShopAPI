@@ -201,3 +201,34 @@ def import_products():
 @app.task
 def update_stock():
     return update_current_stock()
+
+
+@app.task
+def import_prices():
+
+    updated_nomenclatures = []
+
+    prices = None
+    token = get_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(
+        url="https://api.malfini.com/api/v4/product/prices", headers=headers
+    )
+
+    if response.status_code == 200:
+        prices = response.json()
+
+    for data in prices:
+        code = data.get("productSizeCode")
+        price = data.get("price", 0)
+
+        if code:
+            instance = Nomenclature.objects.filter(code=code).first()
+            if instance:
+                instance.price = price
+                updated_nomenclatures.append(instance)
+
+    with transaction.atomic():
+        Nomenclature.objects.bulk_update(updated_nomenclatures, ["price"])
+
+    return response.json()

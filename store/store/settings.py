@@ -65,6 +65,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "products.middleware.JWTAuthenticationMiddleware",
 ]
 
 ROOT_URLCONF = "store.urls"
@@ -151,11 +152,14 @@ SIMPLE_JWT = {
     "TOKEN_USER_CACHE_TIMEOUT": 60 * 5,
 }
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
+}
+
+JWT_AUTH_CACHE_TIMEOUT = 60 * 5
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
@@ -166,7 +170,6 @@ SWAGGER_SETTINGS = {
         },
     },
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 from .mixins import CodeNameMixin
 
@@ -117,6 +118,16 @@ class Size(models.Model):
 
 class Nomenclature(models.Model):
     code = models.CharField(max_length=50, unique=True)
+    price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        validators=[
+            MinValueValidator(
+                MinValueValidator(0, "The price must be equal or greater than 0.")
+            )
+        ],
+        default=0,
+    )
     quantity = models.PositiveIntegerField(default=0)
     nomenclature_size = models.ForeignKey(
         Size, related_name="nomenclatures", on_delete=models.CASCADE
