@@ -9,10 +9,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Running Tests](#running-tests)
-- [Docker Setup](#docker-setup)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
 
 ## Introduction
 This is a Django REST API project template with Celery and JWT authentication integrated. It is designed to be a robust starting point for building modern web applications. 
@@ -90,9 +86,10 @@ This application is designed for importing supplier products and their attribute
 
 ## Usage
 - Access the admin panel at `http://127.0.0.1:8000/admin/`
-- Access the API documentation at `http://127.0.0.1:8000/api/v1/swagger/`
+- Access the API documentation at `http://127.0.0.1:8000/swagger/`
 
 ## Running Tests
 To run tests, use the following command:
-```bash
-python manage.py test
+    ```bash
+    python manage.py test
+    ```

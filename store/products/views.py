@@ -1,4 +1,5 @@
 import copy
+import logging
 
 from django.db import IntegrityError
 from django.http import HttpRequest
@@ -18,12 +19,15 @@ from .utils import (
     get_deserialized_object,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class ImportAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser]
 
     def post(self, request, format="json") -> Response:
+        logger.info(f"INFO: Sent POST request -- USER: {request.user}")
         saved_models, invalid_data = [], []
         json_data = request.data
 
@@ -76,6 +80,7 @@ class ModelListAPIView(APIView):
     """Accept GET request and return objects by model name."""
 
     def get(self, request: HttpRequest, model_name: str) -> Response:
+        logger.info(f"GET REQUEST from {request.user}")
         result: QuerySet | Response = filter_models(model_name)
 
         if isinstance(result, Response):
@@ -87,6 +92,7 @@ class ModelListAPIView(APIView):
             )
 
         data = [get_deserialized_object(obj) for obj in result]
+        logger.info(f"RETURN GET REQUEST to {request.user}")
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -97,6 +103,7 @@ class ModelDetailAPIView(APIView):
     def get(
         self, request: HttpRequest, model_name: str, pk: int, format="json"
     ) -> Response:
+        logger.info(f"GET REQUEST from {request.user}")
         result: QuerySet | Response = filter_models(model_name)
 
         if isinstance(result, Response):
@@ -106,4 +113,5 @@ class ModelDetailAPIView(APIView):
         model = get_object_or_404(object_class, id=pk)
 
         serialized_model: ReturnDict = get_deserialized_object(model)
+        logger.info(f"RETURN GET REQUEST to {request.user}")
         return Response(serialized_model)
