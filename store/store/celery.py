@@ -18,7 +18,7 @@ app.conf.beat_schedule = {
     },
     "task2": {
         "task": "products.tasks.update_stock",
-        "schedule": crontab(hour="19", minute="50"),
+        "schedule": crontab(hour="17", minute="16"),
     },
     # "task3": {
     #     "task": "products.tasks.import_prices",

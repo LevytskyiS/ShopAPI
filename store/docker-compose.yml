@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db:/var/lib/postgresql/data 
+      - ./db:/var/lib/postgresql/data
 
   broker:
     image: rabbitmq:3-management
@@ -24,11 +24,16 @@ services:
     restart: always
     build:
       context: ./
-    ports: 
+    ports:
       - "8000:8000"
     depends_on:
       - postgres
-    command: ["bash", "-c", "sleep 30 && python manage.py runserver 0.0.0.0:8000"]
+    command:
+      [
+        "bash",
+        "-c",
+        "sleep 30 && python manage.py runserver 0.0.0.0:8000"
+      ]
     # command: ["bash", "-c", "sleep 30 && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
 
   worker:
@@ -39,14 +44,13 @@ services:
       - ./import:/app/import
     command: celery -A store worker -l info
 
-
   flower:
     build:
       context: ./
     restart: always
     depends_on:
       - worker
-    ports: 
+    ports:
       - "5555:5555"
     command: celery -A store flower -l info --persistent=True
 
