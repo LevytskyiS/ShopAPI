@@ -1,4 +1,4 @@
-version: '3'
+# version: '3'
 
 services:
   postgres:
@@ -10,6 +10,14 @@ services:
       - "5432:5432"
     volumes:
       - ./db:/var/lib/postgresql/data
+
+  telegram:
+    restart: always
+    build:
+      context: ./
+    depends_on:
+      - postgres
+    command: [ "bash", "-c", "sleep 30 && python report/run.py" ]
 
   broker:
     image: rabbitmq:3-management
@@ -28,12 +36,7 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
-    command:
-      [
-        "bash",
-        "-c",
-        "sleep 30 && python manage.py runserver 0.0.0.0:8000"
-      ]
+    command: [ "bash", "-c", "sleep 30 && python manage.py runserver 0.0.0.0:8000" ]
     # command: ["bash", "-c", "sleep 30 && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
 
   worker:
