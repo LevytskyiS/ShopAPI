@@ -24,7 +24,6 @@ connection_params = {
     "port": DB_PORT,
 }
 
-
 async def clean_date(date):
     date = str(date).split(".")[0]
     date = date.split("+")[0]
@@ -95,13 +94,14 @@ async def calculate_all_time_sales(data: pd.DataFrame) -> str:
     czk = round(mp10m["money"].sum(), 2)
     eur = round(float(czk) / 25.3, 2)
     pcs = mp10m["sold"].sum()
-    return f"CZK: {czk}, EUR: {eur}, SOLD PIECES: {pcs}"
+    return f"💴 CZK:\n{czk:,.2f}\n\n💶 EUR:\n{eur:,.2f}\n\n🧩 Sold pieces:\n{pcs:,}"
 
 
-async def turnover_all_time():
-    # mrt = None
+async def turnover_all_time(days=0):
+    message_title = 'All time stats:\n\n'
     dataframes = []
     data, dates = await get_sales_info()
+
 
     for d in dates:
         dataframes_d = data.loc[data["timestamp"] == d]
@@ -121,6 +121,18 @@ async def turnover_all_time():
                 )
             else:
                 dataframes.append(dataframes_d)
+
+    if days == 1:
+        dataframes = dataframes[-2:]
+        message_title = "Today's stats:\n\n"
+
+    if days == 7:
+        dataframes = dataframes[-7:]
+        message_title = "Stats for the last 7 days:\n\n"
+
+    if days == 15:
+        dataframes = dataframes[-15:]
+        message_title = "Stats for the last 7 days:\n\n"
 
     for i in range(1, len(dataframes)):
         current_element = dataframes[i]
@@ -142,4 +154,4 @@ async def turnover_all_time():
     mrt["money"] = mrt["price_left"] * mrt["sold"]
     mrt = mrt.sort_values(by="sold", ascending=False)
     info: str = await calculate_all_time_sales(mrt)
-    return info
+    return message_title + info

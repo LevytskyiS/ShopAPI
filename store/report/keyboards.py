@@ -8,11 +8,24 @@ from aiogram.types import (
 bt1 = KeyboardButton(text="/help")
 bt2 = KeyboardButton(text="/desc")
 bt3 = KeyboardButton(text="/turnover")
+bt4 = KeyboardButton(text="/products")
+
+turnover_bt1 = InlineKeyboardButton(text="Today", callback_data='today')
+turnover_bt2 = InlineKeyboardButton(text="7 days", callback_data='7days')
+turnover_bt3 = InlineKeyboardButton(text="15 days", callback_data='15days')
+turnover_bt4 = InlineKeyboardButton(text="All time", callback_data='alltime')
+
 
 main_cmds_kb = ReplyKeyboardMarkup(
     keyboard=[
         [bt1, bt2, bt3],
+        [bt4]
     ],
     resize_keyboard=True,
-    input_field_placeholder="Use one of the commands in the menu below.",
+)
+
+turnover_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [turnover_bt1, turnover_bt2, turnover_bt3, turnover_bt4]
+    ]
 )
