@@ -5,6 +5,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 from dotenv import dotenv_values
 
+from queries import QUERY_1
+
 env_vars = dotenv_values(".env")
 DB_HOST = env_vars.get("HOST")
 DB_PORT = env_vars.get("PORT")
@@ -23,6 +25,7 @@ connection_params = {
     "host": DB_HOST,
     "port": DB_PORT,
 }
+
 
 async def clean_date(date):
     date = str(date).split(".")[0]
@@ -53,29 +56,24 @@ async def fetch_data(query: str, connection_params: dict):
     return df
 
 
-async def get_sales_info():
-    query = """
-        SELECT 
-            pc.code, 
-            pv.product_variant_code, 
-            pn2.code, 
-            pn2.price, 
-            pn.quantity, 
-            pn.timestamp 
-        FROM 
-            products_nomenclaturestock pn
-        INNER JOIN 
-            products_nomenclature pn2 
-            ON pn.nomenclature_id = pn2.id
-        INNER JOIN 
-            products_productvariant pv 
-            ON pn2.product_variant_id = pv.id
-        INNER JOIN 
-            products_codenamemixin pc 
-            ON pv.base_product_id = pc.id
-    """
-
+async def get_sales_info(query: str):
     data: pd.DataFrame = await fetch_data(query, connection_params)
+    return data
+
+
+async def calculate_all_time_sales(pcs: int, turnover: int) -> str:
+    eur_turnover = round(float(turnover) / 25.2, 2)
+    return f"💴 CZK:\n{turnover:,.2f}\n\n💶 EUR:\n{eur_turnover:,.2f}\n\n🧩 Sold pieces:\n{pcs:,}"
+
+
+async def turnover_all_time(days=0):
+    sold_pieces = 0
+    czk_turnover = 0
+    emoji = "📊 "
+    message_title = "All time stats:\n\n"
+    dataframes = []
+
+    data = await get_sales_info(QUERY_1)
     data = await process_dates(data)
     dates = data["timestamp"].unique()
     dates.sort()
@@ -83,25 +81,6 @@ async def get_sales_info():
         data["timestamp"],
         format="%Y-%m-%d %H:%M:%S",
     )
-    return data, dates
-
-
-async def calculate_all_time_sales(data: pd.DataFrame) -> str:
-    data = data[["prod_left", "sold", "money"]]
-    mp = data.groupby(["prod_left"]).sum()
-    mp10m = mp.sort_values(by="money", ascending=False)
-    mp10m = mp10m.loc[mp10m["sold"] > 0][["sold", "money"]]
-    czk = round(mp10m["money"].sum(), 2)
-    eur = round(float(czk) / 25.3, 2)
-    pcs = mp10m["sold"].sum()
-    return f"💴 CZK:\n{czk:,.2f}\n\n💶 EUR:\n{eur:,.2f}\n\n🧩 Sold pieces:\n{pcs:,}"
-
-
-async def turnover_all_time(days=0):
-    message_title = 'All time stats:\n\n'
-    dataframes = []
-    data, dates = await get_sales_info()
-
 
     for d in dates:
         dataframes_d = data.loc[data["timestamp"] == d]
@@ -132,7 +111,7 @@ async def turnover_all_time(days=0):
 
     if days == 15:
         dataframes = dataframes[-15:]
-        message_title = "Stats for the last 7 days:\n\n"
+        message_title = "Stats for the last 15 days:\n\n"
 
     for i in range(1, len(dataframes)):
         current_element = dataframes[i]
@@ -144,14 +123,15 @@ async def turnover_all_time(days=0):
             suffixes=("_left", "_right"),
         )
         merged["sold"] = merged["quantity_left"] - merged["quantity_right"]
+        merged["czk"] = merged["sold"] * merged["price_left"]
         merged = merged.sort_values(by="sold", ascending=False)
-        # mrt = merged
 
-    mrt = pd.merge(
-        dataframes[0], dataframes[-1], on="item", suffixes=("_left", "_right")
-    )
-    mrt["sold"] = mrt["quantity_left"] - mrt["quantity_right"]
-    mrt["money"] = mrt["price_left"] * mrt["sold"]
-    mrt = mrt.sort_values(by="sold", ascending=False)
-    info: str = await calculate_all_time_sales(mrt)
-    return message_title + info
+        soldq = merged.loc[merged["sold"] > 0]
+
+        sq = soldq["sold"].sum()
+        sold_pieces += sq
+        czk = soldq["czk"].sum()
+        czk_turnover += czk
+
+    info: str = await calculate_all_time_sales(sold_pieces, czk_turnover)
+    return emoji + message_title + info

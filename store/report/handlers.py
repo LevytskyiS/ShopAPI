@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery
 
-from query import turnover_all_time
+from utils import turnover_all_time
 from messages import start_msg, description_msg, help_msg
 from keyboards import main_cmds_kb, turnover_kb
 
@@ -13,7 +13,7 @@ router = Router()
 
 @router.message(Command("turnover"))
 async def cmd_turnover(message: Message):
-    await message.answer(text="Select a time period", reply_markup=turnover_kb)
+    await message.answer(text="⌚️ Select a time period", reply_markup=turnover_kb)
 
 
 @router.callback_query(F.data == "alltime")

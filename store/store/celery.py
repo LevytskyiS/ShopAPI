@@ -12,13 +12,13 @@ app.autodiscover_tasks()
 
 
 app.conf.beat_schedule = {
-    "task1": {
-        "task": "products.tasks.import_products",
-        "schedule": crontab(hour="17", minute="13"),
-    },
+    # "task1": {
+    #     "task": "products.tasks.import_products",
+    #     "schedule": crontab(hour="17", minute="13"),
+    # },
     "task2": {
         "task": "products.tasks.update_stock",
-        "schedule": crontab(hour="17", minute="36"),
+        "schedule": crontab(hour="17", minute="18"),
     },
     # "task3": {
     #     "task": "products.tasks.import_prices",
