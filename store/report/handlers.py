@@ -2,12 +2,11 @@ from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery
 
-from utils import turnover_all_time
+from sales import turnover_all_time
 from messages import start_msg, description_msg, help_msg
 from keyboards import main_cmds_kb, turnover_kb
 
-# router ставится вместо dp в качестве декоратора, чтобы не было
-# циклического импорта
+# The router is used instead of dp as a decorator to avoid circular imports.
 router = Router()
 
 
