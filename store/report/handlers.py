@@ -12,8 +12,9 @@ from messages import (
     item_not_found_msg,
 )
 from keyboards import main_cmds_kb, turnover_kb
-from states import StockInfo
+from states import StockInfo, ProductInfo
 from stock import get_stock
+from products import get_product_info
 
 # The router is used instead of dp as a decorator to avoid circular imports.
 router = Router()
@@ -50,6 +51,41 @@ async def cmd_stock_second(message: Message, state: FSMContext):
         await state.clear()
 
         result = await get_stock(item_code)
+
+        if result:
+            return await message.answer(text=result, reply_markup=main_cmds_kb)
+        return await message.answer(
+            text=item_not_found_msg,
+            reply_markup=main_cmds_kb,
+        )
+
+
+# Product info
+@router.message(Command("product"))
+async def cmd_product_first(message: Message, state: FSMContext):
+    await state.set_state(ProductInfo.product)
+    await message.answer(
+        text="👕 Enter a product code (3 signs)", reply_markup=ReplyKeyboardRemove()
+    )
+
+
+@router.message(ProductInfo.product)
+async def cmd_product_second(message: Message, state: FSMContext):
+    product = message.text.strip()
+
+    if len(product) != 3:
+        await state.clear()
+        return await message.answer(
+            text="Incorrect product code. It must be 3 signs long.",
+            reply_markup=main_cmds_kb,
+        )
+    else:
+        await state.update_data(product=message.text)
+        data = await state.get_data()
+        product_code = data.get("product")
+        await state.clear()
+
+        result = await get_product_info(product_code)
 
         if result:
             return await message.answer(text=result, reply_markup=main_cmds_kb)

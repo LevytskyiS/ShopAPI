@@ -8,7 +8,7 @@ from aiogram.types import (
 bt1 = KeyboardButton(text="/help")
 bt2 = KeyboardButton(text="/desc")
 bt3 = KeyboardButton(text="/turnover")
-bt4 = KeyboardButton(text="/products")
+bt4 = KeyboardButton(text="/product")
 bt5 = KeyboardButton(text="/stock")
 
 turnover_bt1 = InlineKeyboardButton(text="Today", callback_data="today")
