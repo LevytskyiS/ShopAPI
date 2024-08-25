@@ -18,3 +18,30 @@ QUERY_1 = """
         products_codenamemixin pc 
         ON pv.base_product_id = pc.id
 """
+
+QUERY_2 = """
+    SELECT 
+        pv.product_variant_code, pn.code, pn.price, pn.quantity
+    FROM 
+        products_nomenclature pn
+    INNER JOIN 
+        products_productvariant pv 
+        ON pn.product_variant_id = pv.id
+"""
+
+# QUERY_2 = """
+#     SELECT
+#         pc.code,
+#         pv.product_variant_code,
+#         pn.code,
+#         pn.price,
+#         pn.quantity
+#     FROM
+#         products_nomenclature pn
+#     INNER JOIN
+#         products_productvariant pv
+#         ON pn.product_variant_id = pv.id
+#     INNER JOIN
+#         products_codenamemixin pc
+#         ON pv.base_product_id = pc.id
+# """

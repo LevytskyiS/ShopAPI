@@ -9,6 +9,10 @@ help_msg = "\
 /start - Start the bot\n\
 /help - List of available commands\n\
 /desc - Bot description\n\
-/turnover - Keyboard with turnover data\n\n\
+/turnover - Keyboard with turnover data\n\
+/stock - Check stock availability\n\n\
 Some new commands will be added soon 😉\
 "
+callback_answer = "Sent request"
+
+item_not_found_msg = "Item not found. Check the code and try again"
