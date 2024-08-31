@@ -6,19 +6,27 @@ import requests
 from django.db import transaction
 from dotenv import dotenv_values
 from rest_framework import status
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+from mongoengine import connect
 
 from store.celery import app
 from .models import Nomenclature, NomenclatureStock
+from .models_mongo import UserMongo, NomenclatureMongo
 
 
 env_vars = dotenv_values("./.env")
 token_vars = dotenv_values("./token.env")
+
 token_env = "./token.env"
 products = "./import/data.json"
 stock = "./import/stock.json"
+
 import_url = "http://webapp:8000/api/v1/import/"  # for Docker Compose
 stock_url = env_vars.get("STOCK_URL")
 token_url = env_vars.get("TOKEN_URL")
+
+URI_MONGO = env_vars.get("URI_MONGO")
 
 
 def load_stock_data():
@@ -190,6 +198,47 @@ def update_current_stock() -> list:
     return status.HTTP_204_NO_CONTENT
 
 
+def check_mongo_connection():
+    client = MongoClient(URI_MONGO, server_api=ServerApi("1"))
+
+    try:
+        client.admin.command("ping")
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+        return
+
+    return client
+
+
+def update_future_stock():
+    client = check_mongo_connection()
+
+    if not client:
+        return
+
+    connect(host=URI_MONGO, db="stock")
+    NomenclatureMongo.drop_collection()
+
+    token = get_token()
+    get_stock(token)
+    stock_data = load_stock_data()
+
+    items = []
+
+    for data in stock_data:
+        item = NomenclatureMongo(
+            code=data.get("productSizeCode"),
+            quantity=data.get("quantity"),
+            stock=data.get("date"),
+        )
+        items.append(item)
+
+    NomenclatureMongo.objects.insert(items)
+
+    return True
+
+
 @app.task
 def import_products():
     token = get_token()
@@ -201,6 +250,11 @@ def import_products():
 @app.task
 def update_stock():
     return update_current_stock()
+
+
+@app.task
+def update_stock_dates():
+    return update_future_stock()
 
 
 @app.task
@@ -232,3 +286,7 @@ def import_prices():
         Nomenclature.objects.bulk_update(updated_nomenclatures, ["price"])
 
     return response.json()
+
+
+if __name__ == "__main__":
+    update_future_stock()

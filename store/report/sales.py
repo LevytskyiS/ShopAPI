@@ -1,7 +1,6 @@
 import asyncio
 
 import pandas as pd
-from dotenv import dotenv_values
 
 from fetch import fetch_data
 from queries import QUERY_1

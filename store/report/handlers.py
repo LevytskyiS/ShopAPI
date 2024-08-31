@@ -12,13 +12,50 @@ from messages import (
     item_not_found_msg,
 )
 from keyboards import main_cmds_kb, turnover_kb
-from states import StockInfo, ProductInfo
-from stock import get_stock
+from states import StockInfo, ProductInfo, RestockInfo
+from stock import get_stock, get_restock
 from products import get_product_info
 from permissions import check_permission
+from validators import validate_nomenclature_restock, validate_nomenclature_stock
 
 # The router is used instead of dp as a decorator to avoid circular imports.
 router = Router()
+
+
+# Restock dates
+@router.message(Command("restock"))
+@check_permission
+async def cmd_restock_dates_first(message: Message, state: FSMContext):
+    await state.set_state(RestockInfo.item)
+    await message.answer(
+        text="👕 Enter a nomenclature (7 digits)",
+        reply_markup=ReplyKeyboardRemove(),
+    )
+
+
+@router.message(RestockInfo.item)
+async def cmd_restock_dates_second(message: Message, state: FSMContext):
+    item = message.text.strip()
+
+    validated, msg = await validate_nomenclature_restock(item)
+
+    if not validated:
+        await state.clear()
+        return await message.answer(text=msg, reply_markup=main_cmds_kb)
+
+    await state.update_data(item=message.text)
+    data = await state.get_data()
+    item_code = data.get("item")
+    await state.clear()
+
+    result = await get_restock(db="stock", item=item_code)
+
+    if result:
+        return await message.answer(text=result, reply_markup=main_cmds_kb)
+    return await message.answer(
+        text=item_not_found_msg,
+        reply_markup=main_cmds_kb,
+    )
 
 
 # Stock
@@ -35,31 +72,25 @@ async def cmd_stock_first(message: Message, state: FSMContext):
 async def cmd_stock_second(message: Message, state: FSMContext):
     item = message.text.strip()
 
-    if not item.isdigit():
-        await state.clear()
-        return await message.answer(
-            text="It must be a number", reply_markup=main_cmds_kb
-        )
+    validated, msg = await validate_nomenclature_stock(item)
 
-    if len(item) != 5 and len(item) != 7:
+    if not validated:
         await state.clear()
-        return await message.answer(
-            text="Incorrect nomenclature", reply_markup=main_cmds_kb
-        )
-    else:
-        await state.update_data(item=message.text)
-        data = await state.get_data()
-        item_code = data.get("item")
-        await state.clear()
+        return await message.answer(text=msg, reply_markup=main_cmds_kb)
 
-        result = await get_stock(item_code)
+    await state.update_data(item=message.text)
+    data = await state.get_data()
+    item_code = data.get("item")
+    await state.clear()
 
-        if result:
-            return await message.answer(text=result, reply_markup=main_cmds_kb)
-        return await message.answer(
-            text=item_not_found_msg,
-            reply_markup=main_cmds_kb,
-        )
+    result = await get_stock(item_code)
+
+    if result:
+        return await message.answer(text=result, reply_markup=main_cmds_kb)
+    return await message.answer(
+        text=item_not_found_msg,
+        reply_markup=main_cmds_kb,
+    )
 
 
 # Product info

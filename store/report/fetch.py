@@ -1,18 +1,7 @@
-import asyncio
-
 import asyncpg
-import pandas as pd
-from sqlalchemy import create_engine
-from dotenv import dotenv_values
 
 from queries import QUERY_1
-
-env_vars = dotenv_values(".env")
-DB_HOST = env_vars.get("HOST")
-DB_PORT = env_vars.get("PORT")
-DB_NAME = env_vars.get("NAME")
-DB_USER = env_vars.get("USER")
-DB_PASSWORD = env_vars.get("PASSWORD")
+from conf import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, URI_MONGO
 
 
 async def fetch_data(query: str):

@@ -11,7 +11,8 @@ help_msg = "\
 /desc - Bot description\n\
 /turnover - Turnover stats\n\
 /product - Product information\n\
-/stock - Check stock availability\n\n\
+/stock - Check stock availability\n\
+/restock - Check restock availability\n\n\
 Some new commands will be added soon 😉\
 "
 callback_answer = "Sent request"

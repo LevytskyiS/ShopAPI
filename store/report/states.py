@@ -5,5 +5,9 @@ class StockInfo(StatesGroup):
     item = State()
 
 
+class RestockInfo(StatesGroup):
+    item = State()
+
+
 class ProductInfo(StatesGroup):
     product = State()

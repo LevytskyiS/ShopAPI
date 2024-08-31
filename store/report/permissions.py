@@ -1,13 +1,9 @@
 from functools import wraps
 
 from aiogram.types import Message
-from dotenv import dotenv_values
 
 from messages import denied_msg
-
-
-env_vars = dotenv_values(".env")
-USER_ID = env_vars.get("TG_USER_ID")
+from conf import USER_ID
 
 
 async def permission(message: Message) -> bool:
