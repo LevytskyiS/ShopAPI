@@ -17,3 +17,5 @@ Some new commands will be added soon 😉\
 callback_answer = "Sent request"
 
 item_not_found_msg = "Item not found. Check the code and try again"
+
+denied_msg = "❌ Permission denied"

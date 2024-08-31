@@ -15,6 +15,7 @@ from keyboards import main_cmds_kb, turnover_kb
 from states import StockInfo, ProductInfo
 from stock import get_stock
 from products import get_product_info
+from permissions import check_permission
 
 # The router is used instead of dp as a decorator to avoid circular imports.
 router = Router()
@@ -22,6 +23,7 @@ router = Router()
 
 # Stock
 @router.message(Command("stock"))
+@check_permission
 async def cmd_stock_first(message: Message, state: FSMContext):
     await state.set_state(StockInfo.item)
     await message.answer(
@@ -62,6 +64,7 @@ async def cmd_stock_second(message: Message, state: FSMContext):
 
 # Product info
 @router.message(Command("product"))
+@check_permission
 async def cmd_product_first(message: Message, state: FSMContext):
     await state.set_state(ProductInfo.product)
     await message.answer(
@@ -97,6 +100,7 @@ async def cmd_product_second(message: Message, state: FSMContext):
 
 # Turnover stats
 @router.message(Command("turnover"))
+@check_permission
 async def cmd_turnover(message: Message):
     await message.answer(text="⌚️ Select a time period", reply_markup=turnover_kb)
 
@@ -137,15 +141,18 @@ async def get_fifteen_days_sales(callback: CallbackQuery):
 
 # Basic commands
 @router.message(Command("desc"))
+@check_permission
 async def cmd_help(message: Message):
     await message.answer(text=description_msg)
 
 
 @router.message(Command("help"))
+@check_permission
 async def cmd_help(message: Message):
     await message.answer(text=help_msg)
 
 
 @router.message(CommandStart())
+@check_permission
 async def cmd_start(message: Message):
     await message.answer(text=start_msg, reply_markup=main_cmds_kb)
