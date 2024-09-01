@@ -1,13 +1,24 @@
 from functools import wraps
 
 from aiogram.types import Message
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.server_api import ServerApi
 
 from messages import denied_msg
-from conf import USER_ID
+from conf import USER_ID, URI_MONGO
+
+
+async def fetch_mongo_users(user_id):
+    client = AsyncIOMotorClient(URI_MONGO, server_api=ServerApi("1"))
+    db = client["auth"]
+    collection = db["user"]
+    user = await collection.find_one({"tg_id": user_id})
+    return user
 
 
 async def permission(message: Message) -> bool:
-    if str(message.from_user.id) != USER_ID:
+    user = await fetch_mongo_users(message.from_user.id)
+    if not user:
         return
     return True
 

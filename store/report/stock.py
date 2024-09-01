@@ -1,4 +1,3 @@
-from mongoengine import connect
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 
@@ -83,13 +82,11 @@ async def get_restock(db: str, item):
 
     if len(data) == 1:
         obj = data[0]
-        return f"👕 {obj["code"]}:\n\
-🧩 {obj["quantity"]}\n\n\
+        return f"👕 {obj['code']}:\n\
+🧩 {obj['quantity']}\n\n\
 ⭕️ No restock dates"
 
     sorted_data = sorted(data, key=lambda x: x["stock"])
-
-    # Вывод отсортированного списка
 
     stock_info = ""
     for item in sorted_data:

@@ -9,5 +9,5 @@ class NomenclatureMongo(Document):
 
 
 class UserMongo(Document):
-    tg_id = StringField(required=True)
+    tg_id = IntField(required=True)
     name = StringField(required=True)
