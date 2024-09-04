@@ -11,15 +11,18 @@
 - [Running Tests](#running-tests)
 
 ## Introduction
-This is a Django REST API project template with Celery and JWT authentication integrated. It is designed to be a robust starting point for building modern web applications. 
+This is a Django REST API project template with integrated Celery and JWT authentication. It is designed to be a robust starting point for building modern web applications.
 
-This application is designed for importing supplier products and their attributes into a database for subsequent use on the reseller's website. A separate script checks the availability of products on the supplier's website once a day and uses this data to update the stock in the reseller's database.
+This application is intended for importing supplier products and their attributes into a database for subsequent use on the reseller's website. A separate script checks the availability of products on the supplier's website once a day and uses this data to update the stock in the reseller's database.
+
+Additionally, the application is integrated with a Telegram bot that serves as an assistant for sales representatives. This bot can quickly provide information about products, check stock availability, and give details about upcoming delivery dates, making it a valuable tool for efficient sales operations.
 
 ## Features
 - Django 3.10
 - Celery for background tasks
 - JWT authentication using Simple JWT
 - PostgreSQL as the database
+- MongoDB as the cloud storage
 - Docker and Docker Compose for containerization
 - REST API with Django REST Framework
 - Swagger documentation with drf-yasg
@@ -33,6 +36,8 @@ This application is designed for importing supplier products and their attribute
 - Celery 5.4.0
 - Simple JWT 5.3.1
 - Django REST Framework 3.15.2
+- Aioaiogram 3.11.0
+- Pymongo 4.8.0
 
 ## Installation
 1. Clone the repository:
@@ -68,7 +73,6 @@ This application is designed for importing supplier products and their attribute
     PASSWORD=password
     HOST=host
     PORT=1234
-    <!-- Supplier`s API / For certain reasons the name of the supplier and it`s API will not be provided -->
     STOCK_URL=products_url
     TOKEN_URL=token_url
     ```
