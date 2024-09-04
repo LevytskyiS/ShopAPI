@@ -60,21 +60,27 @@ Additionally, the application is integrated with a Telegram bot that serves as a
 
 4. Set up the `.env` file with your environment variables:
     ```env
-    <!-- Supplier`s account -->
-    USERNAME=username               
-    PASSWORD_SHOP=password
+    <!-- Django App -->
+    SECRET_KEY=secret_key
     <!-- DRF App account -->
     API_USER_USERNAME=username       
     API_USER_PASSWORD=password
-    <!-- Database -->
+    <!-- Supplier`s account -->
+    USERNAME=username               
+    PASSWORD_SHOP=password
+    STOCK_URL=products_url
+    TOKEN_URL=token_url
+    <!-- PostgreSQL Database -->
     ENGINE=engine
     NAME=db_name
     USER=db_user
     PASSWORD=password
     HOST=host
     PORT=1234
-    STOCK_URL=products_url
-    TOKEN_URL=token_url
+    <!-- Telegram Bot -->
+    TG_TOKEN=telgegram_bot_token
+    <!-- MongoDB URI -->
+    URI_MONGO=mongodb_uri
     ```
 
 5. Run docker containers

@@ -4,7 +4,6 @@ from pymongo.server_api import ServerApi
 from conf import URI_MONGO
 from fetch import fetch_data
 from queries import QUERY_2
-from models import NomenclatureMongo
 
 
 async def emoji_str(emoji: str, stock: str, item_number) -> str:
