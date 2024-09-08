@@ -1,3 +1,4 @@
+from typing import Union
 import copy
 import logging
 
@@ -81,14 +82,14 @@ class ModelListAPIView(APIView):
 
     def get(self, request: HttpRequest, model_name: str) -> Response:
         logger.info(f"GET REQUEST from {request.user}")
-        result: QuerySet | Response = filter_models(model_name)
+        result: Union[QuerySet, Response] = filter_models(model_name)
 
         if isinstance(result, Response):
             return result
 
         if not result:
             return Response(
-                {"result": f"No objects of the '{model_name}' model found"}, status=404
+                {"result": f"No objects found for model '{model_name}'"}, status=404
             )
 
         data = [get_deserialized_object(obj) for obj in result]
@@ -104,7 +105,7 @@ class ModelDetailAPIView(APIView):
         self, request: HttpRequest, model_name: str, pk: int, format="json"
     ) -> Response:
         logger.info(f"GET REQUEST from {request.user}")
-        result: QuerySet | Response = filter_models(model_name)
+        result: Union[QuerySet, Response] = filter_models(model_name)
 
         if isinstance(result, Response):
             return result

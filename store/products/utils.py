@@ -67,6 +67,7 @@ models = {
 
 
 def get_categories(data: list) -> dict:
+    """Retrieve and return product categories."""
     categories = []
     seen = set()
 
@@ -86,6 +87,7 @@ def get_categories(data: list) -> dict:
 
 
 def get_genders(data: list) -> dict:
+    """Retrieve and return product genders."""
     genders = []
     seen = set()
 
@@ -106,6 +108,7 @@ def get_genders(data: list) -> dict:
 
 
 def get_trademarks(data: list) -> dict:
+    """Retrieve and return product trademarks."""
     trademarks = []
     seen = set()
 
@@ -124,6 +127,7 @@ def get_trademarks(data: list) -> dict:
 
 
 def get_product_types(data: list) -> dict:
+    """Retrieve and return product types."""
     types = []
     seen = set()
 
@@ -141,6 +145,7 @@ def get_product_types(data: list) -> dict:
 
 
 def get_subtitles(data: list) -> dict:
+    """Retrieve and return product subtitles."""
     seen_subtitles = set()
     subtitles = []
 
@@ -156,6 +161,7 @@ def get_subtitles(data: list) -> dict:
 
 
 def get_specifications(data: list) -> dict:
+    """Retrieve and return product specifications."""
     seen_specifications = set()
     specifications = []
 
@@ -171,6 +177,7 @@ def get_specifications(data: list) -> dict:
 
 
 def get_descriptions(data: list) -> dict:
+    """Retrieve and return product descriptions."""
     seen_descriptions = set()
     descriptions = []
 
@@ -186,6 +193,7 @@ def get_descriptions(data: list) -> dict:
 
 
 def get_products(data: list) -> dict:
+    """Retrieve and return products."""
     products = []
     for product in data:
         name = product.get("name")
@@ -210,6 +218,7 @@ def get_products(data: list) -> dict:
 
 
 def get_colors(data: list) -> dict:
+    """Retrieve and return product colors."""
     colors = []
     colors_seen = set()
 
@@ -234,6 +243,7 @@ def get_colors(data: list) -> dict:
 
 
 def get_products_variants(data: list) -> dict:
+    """Retrieve and return product variants."""
     product_variants = []
 
     for product in data:
@@ -251,6 +261,7 @@ def get_products_variants(data: list) -> dict:
 
 
 def get_sizes(data: list) -> dict:
+    """Retrieve and return product sizes."""
     sizes = []
     sizes_seen = set()
 
@@ -273,6 +284,7 @@ def get_sizes(data: list) -> dict:
 
 
 def get_nomenclatures(data: list) -> list:
+    """Retrieve and return product nomenclatures."""
     nomenclatures = []
     seen = set()
 
@@ -304,7 +316,8 @@ def get_nomenclatures(data: list) -> list:
         return {"Nomenclature": nomenclatures}
 
 
-def parse_json_data(data: list):
+def parse_json_data(data: list) -> tuple:
+    """Parse JSON data and return a tuple of extracted data."""
     categories = get_categories(data)
     genders = get_genders(data)
     trademarks = get_trademarks(data)
@@ -334,21 +347,7 @@ def parse_json_data(data: list):
     ]
 
 
-def filter_models(model_name: str):
-    """Find and retrieve models by name."""
-    app_models = apps.get_app_config(APP_NAME).get_models()
-
-    for model in app_models:
-        if model.__name__.lower() == model_name.lower():
-            return model.objects.all()
-
-    return Response(
-        {"error": f"No model with name '{model_name}' was found"},
-        status=status.HTTP_404_NOT_FOUND,
-    )
-
-
-def filter_models(model_name: str):
+def filter_models(model_name: str) -> Response:
     """Find and retrieve models by name."""
     app_models = apps.get_app_config(APP_NAME).get_models()
 
@@ -363,6 +362,7 @@ def filter_models(model_name: str):
 
 
 def get_deserialized_object(obj: object) -> ReturnDict:
+    """Deserialize and return deserialized object."""
     for key, value in models.items():
         if isinstance(obj, value):
             return model_serializers_mapping[key](obj).data

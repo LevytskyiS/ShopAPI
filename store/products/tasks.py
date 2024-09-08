@@ -12,7 +12,7 @@ from mongoengine import connect
 
 from store.celery import app
 from .models import Nomenclature, NomenclatureStock
-from .models_mongo import UserMongo, NomenclatureMongo
+from .models_mongo import NomenclatureMongo
 
 
 env_vars = dotenv_values("./.env")
@@ -29,14 +29,15 @@ token_url = env_vars.get("TOKEN_URL")
 URI_MONGO = env_vars.get("URI_MONGO")
 
 
-def load_stock_data():
+def load_stock_data() -> dict:
+    """Load stock data from JSON file."""
     with open(stock, "r", encoding="utf-8") as fh:
         stock_data = json.load(fh)
         return stock_data
 
 
-def get_token():
-
+def get_token() -> str:
+    """Get and save token."""
     username = env_vars.get("USERNAME")
     password = env_vars.get("PASSWORD_SHOP")
 
@@ -57,7 +58,8 @@ def get_token():
     return access_token
 
 
-def get_inner_token():
+def get_inner_token() -> str:
+    """Return token."""
     api_username = env_vars.get("API_USER_USERNAME")
     api_password = env_vars.get("API_USER_PASSWORD")
 
@@ -99,7 +101,7 @@ def send_products():
     return response.status_code
 
 
-def get_stock(token):
+def get_stock(token: str) -> None:
     headers = {"Authorization": f"Bearer {token}"}
     reponse = requests.get(url=stock_url, headers=headers)
 
@@ -113,7 +115,7 @@ def get_stock(token):
         json.dump(content, fh, indent=4)
 
 
-def update_nomenclature(code, quantity):
+def update_nomenclature(code: str, quantity: int) -> Nomenclature:
     item = Nomenclature.objects.filter(code=code).first()
     if not item:
         return False
@@ -121,7 +123,8 @@ def update_nomenclature(code, quantity):
     return item
 
 
-def create_nomenclature_stock(code, quantity):
+def create_nomenclature_stock(code: str, quantity: int) -> NomenclatureStock:
+    """Create NomenclatureStock object."""
     item = Nomenclature.objects.filter(code=code).first()
     if not item:
         return False
@@ -129,6 +132,8 @@ def create_nomenclature_stock(code, quantity):
 
 
 def update_current_stock() -> list:
+    """Update current stock from file."""
+
     update_nomenclatures = []
     update_nomenclatures_stock = []
 
@@ -198,7 +203,8 @@ def update_current_stock() -> list:
     return status.HTTP_204_NO_CONTENT
 
 
-def check_mongo_connection():
+def check_mongo_connection() -> MongoClient:
+    """Check connection to MongoDB database."""
     client = MongoClient(URI_MONGO, server_api=ServerApi("1"))
 
     try:
@@ -212,6 +218,8 @@ def check_mongo_connection():
 
 
 def update_future_stock():
+    """Update stock for future dates."""
+
     client = check_mongo_connection()
 
     if not client:
@@ -241,6 +249,7 @@ def update_future_stock():
 
 @app.task
 def import_products():
+    """Import products, product variants and nomenclatures."""
     token = get_token()
     get_products(token)
     status_code = send_products()
@@ -249,17 +258,19 @@ def import_products():
 
 @app.task
 def update_stock():
+    """Launch update current stock function."""
     return update_current_stock()
 
 
 @app.task
 def update_stock_dates():
+    """Launch check and update restock dates function."""
     return update_future_stock()
 
 
 @app.task
 def import_prices():
-
+    """Import and set up actual prices."""
     updated_nomenclatures = []
 
     prices = None

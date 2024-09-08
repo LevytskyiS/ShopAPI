@@ -76,7 +76,7 @@ class CategorySerializer(CodeNameSerializer):
         model = Category
         fields = ["id", "name", "code"]
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         name = data.get("name")
         if name.isdigit():
             raise serializers.ValidationError({"name": "This field must be a string."})
@@ -87,7 +87,7 @@ class CategorySerializer(CodeNameSerializer):
 
         return data
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Category:
         instance_code = validated_data.get("code")
 
         with transaction.atomic():
@@ -115,7 +115,7 @@ class GenderSerializer(CodeNameSerializer):
         model = Gender
         fields = ["id", "name", "code"]
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Gender:
         instance_name = validated_data.get("name")
 
         with transaction.atomic():
@@ -141,14 +141,14 @@ class TrademarkSerializer(serializers.ModelSerializer):
         model = Trademark
         fields = ["id", "trademark"]
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         trademark = data.get("trademark")
         if trademark.isdigit():
             raise serializers.ValidationError({"name": "This field must be a string."})
 
         return data
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Trademark:
         instance_trademark = validated_data.get("trademark")
 
         with transaction.atomic():
@@ -174,14 +174,15 @@ class ProductTypeSerializer(serializers.ModelSerializer):
         model = ProductType
         fields = ["id", "type"]
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         trademark = data.get("type")
         if trademark.isdigit():
             raise serializers.ValidationError({"name": "This field must be a string."})
 
         return data
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> ProductType:
+
         instance_type = validated_data.get("type")
 
         with transaction.atomic():
@@ -207,14 +208,14 @@ class SubtitleSerializer(serializers.ModelSerializer):
         model = Subtitle
         fields = ["id", "subtitle"]
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         trademark = data.get("subtitle")
         if trademark.isdigit():
             raise serializers.ValidationError({"name": "This field must be a string."})
 
         return data
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Subtitle:
         instance_subtitle = validated_data.get("subtitle")
 
         with transaction.atomic():
@@ -240,14 +241,14 @@ class SpecificationSerializer(serializers.ModelSerializer):
         model = Specification
         fields = ["id", "specification"]
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         trademark = data.get("specification")
         if trademark.isdigit():
             raise serializers.ValidationError({"name": "This field must be a string."})
 
         return data
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Specification:
         instance_specification = validated_data.get("specification")
 
         with transaction.atomic():
@@ -277,14 +278,14 @@ class DescriptionSerializer(serializers.ModelSerializer):
         model = Description
         fields = ["id", "description"]
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         trademark = data.get("description")
         if trademark.isdigit():
             raise serializers.ValidationError({"name": "This field must be a string."})
 
         return data
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Description:
         instance_description = validated_data.get("description")
 
         with transaction.atomic():
@@ -351,7 +352,7 @@ class ProductSerializer(CodeNameSerializer):
             "specification_content",
         ]
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Product:
         instance_code = validated_data.get("code")
 
         with transaction.atomic():
@@ -423,7 +424,7 @@ class ColorSerializer(CodeNameSerializer):
         model = Color
         fields = ["id", "code", "name", "image"]
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Color:
         instance_code = validated_data.get("code")
 
         with transaction.atomic():
@@ -459,9 +460,10 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             "color",
         ]
 
-    def validate(self, data):
+    def validate(self, data: dict) -> dict:
         color = data.get("colorCode")
         code = data.get("product_variant_code")
+
         if len(color) != 2:
             raise serializers.ValidationError(
                 {"name": "The color code must be 2 sign long."}
@@ -472,7 +474,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 
         return data
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> ProductVariant:
         instance_code = validated_data.get("colorCode")
 
         with transaction.atomic():
@@ -517,7 +519,7 @@ class SizeSerializer(CodeNameSerializer):
         model = Size
         fields = ["id", "code", "name"]
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Size:
         instance_code = validated_data.get("code")
 
         with transaction.atomic():
@@ -555,7 +557,7 @@ class NomenclatureSerializer(CodeNameSerializer):
             "quantity",
         ]
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Nomenclature:
         instance_code = validated_data.get("code")
 
         with transaction.atomic():

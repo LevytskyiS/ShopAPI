@@ -28,7 +28,7 @@ router = Router()
 async def cmd_restock_dates_first(message: Message, state: FSMContext):
     await state.set_state(RestockInfo.item)
     await message.answer(
-        text="👕 Enter a nomenclature (7 digits)",
+        text="👕 Enter a nomenclature (7 signs)",
         reply_markup=ReplyKeyboardRemove(),
     )
 
@@ -61,10 +61,11 @@ async def cmd_restock_dates_second(message: Message, state: FSMContext):
 # Stock
 @router.message(Command("stock"))
 @check_permission
-async def cmd_stock_first(message: Message, state: FSMContext):
+async def cmd_stock_first(message: Message, state: FSMContext) -> None:
     await state.set_state(StockInfo.item)
     await message.answer(
-        text="👕 Enter a nomenclature", reply_markup=ReplyKeyboardRemove()
+        text="👕 Enter a nomenclature (5 or 7 signs)",
+        reply_markup=ReplyKeyboardRemove(),
     )
 
 
@@ -96,7 +97,7 @@ async def cmd_stock_second(message: Message, state: FSMContext):
 # Product info
 @router.message(Command("product"))
 @check_permission
-async def cmd_product_first(message: Message, state: FSMContext):
+async def cmd_product_first(message: Message, state: FSMContext) -> None:
     await state.set_state(ProductInfo.product)
     await message.answer(
         text="👕 Enter a product code (3 signs)", reply_markup=ReplyKeyboardRemove()
@@ -132,58 +133,52 @@ async def cmd_product_second(message: Message, state: FSMContext):
 # Turnover stats
 @router.message(Command("turnover"))
 @check_permission
-async def cmd_turnover(message: Message):
+async def cmd_turnover(message: Message) -> None:
     await message.answer(text="⌚️ Select a time period", reply_markup=turnover_kb)
 
 
 @router.callback_query(F.data == "alltime")
-async def get_all_time_sales(callback: CallbackQuery):
+async def get_all_time_sales(callback: CallbackQuery) -> None:
     await callback.answer(callback_answer)
     data = await turnover_all_time()
     await callback.message.answer(text=data)
 
 
 @router.callback_query(F.data == "today")
-async def get_seven_days_sales(callback: CallbackQuery):
+async def get_seven_days_sales(callback: CallbackQuery) -> None:
     await callback.answer(callback_answer)
     data = await turnover_all_time(1)
     await callback.message.answer(text=data)
 
 
 @router.callback_query(F.data == "7days")
-async def get_seven_days_sales(callback: CallbackQuery):
+async def get_seven_days_sales(callback: CallbackQuery) -> None:
     await callback.answer(callback_answer)
     data = await turnover_all_time(7)
     await callback.message.answer(text=data)
 
 
 @router.callback_query(F.data == "15days")
-async def get_fifteen_days_sales(callback: CallbackQuery):
+async def get_fifteen_days_sales(callback: CallbackQuery) -> None:
     await callback.answer(callback_answer)
     data = await turnover_all_time(15)
     await callback.message.answer(text=data)
 
 
-# класс F - фильтр сообщений
-# @router.message(F.text == "kek")
-# async def cmd_kek(message: Message):
-#     await message.answer(text="kek")
-
-
 # Basic commands
 @router.message(Command("desc"))
 @check_permission
-async def cmd_help(message: Message):
+async def cmd_help(message: Message) -> None:
     await message.answer(text=description_msg)
 
 
 @router.message(Command("help"))
 @check_permission
-async def cmd_help(message: Message):
+async def cmd_help(message: Message) -> None:
     await message.answer(text=help_msg)
 
 
 @router.message(CommandStart())
 @check_permission
-async def cmd_start(message: Message):
+async def cmd_start(message: Message) -> None:
     await message.answer(text=start_msg, reply_markup=main_cmds_kb)

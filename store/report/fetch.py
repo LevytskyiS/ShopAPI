@@ -1,10 +1,11 @@
 import asyncpg
 
-from queries import QUERY_1
-from conf import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, URI_MONGO
+from conf import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
 
 
-async def fetch_data(query: str):
+async def fetch_data(query: str) -> list:
+    """Retieve data from the database using the provided query."""
+
     connection_params = {
         "user": DB_USER,
         "password": DB_PASSWORD,

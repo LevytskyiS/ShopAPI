@@ -7,6 +7,9 @@ from .mixins import CodeNameMixin
 class Category(CodeNameMixin):
     pass
 
+    def __str__(self) -> str:
+        return self.name
+
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
@@ -14,6 +17,9 @@ class Category(CodeNameMixin):
 
 class Gender(CodeNameMixin):
     pass
+
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         verbose_name = "Gender"
@@ -23,6 +29,9 @@ class Gender(CodeNameMixin):
 class Trademark(models.Model):
     trademark = models.CharField(max_length=30)
 
+    def __str__(self) -> str:
+        return self.trademark
+
     class Meta:
         verbose_name = "Trademark"
         verbose_name_plural = "Trademarks"
@@ -30,6 +39,9 @@ class Trademark(models.Model):
 
 class ProductType(models.Model):
     type = models.CharField(max_length=30)
+
+    def __str__(self) -> str:
+        return self.type
 
     class Meta:
         verbose_name = "Product Type"
@@ -39,6 +51,9 @@ class ProductType(models.Model):
 class Subtitle(models.Model):
     subtitle = models.CharField(max_length=100)
 
+    def __str__(self) -> str:
+        return self.subtitle
+
     class Meta:
         verbose_name = "Subtitle"
         verbose_name_plural = "Subtitles"
@@ -47,6 +62,9 @@ class Subtitle(models.Model):
 class Specification(models.Model):
     specification = models.CharField(max_length=1000)
 
+    def __str__(self) -> str:
+        return self.specification
+
     class Meta:
         verbose_name = "Specification"
         verbose_name_plural = "Specifications"
@@ -54,6 +72,9 @@ class Specification(models.Model):
 
 class Description(models.Model):
     description = models.CharField(max_length=1000)
+
+    def __str__(self) -> str:
+        return self.description
 
     class Meta:
         verbose_name = "Description"
@@ -80,6 +101,9 @@ class Product(CodeNameMixin):
         Specification, related_name="products", on_delete=models.CASCADE, null=True
     )
 
+    def __str__(self) -> str:
+        return self.name
+
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
@@ -87,6 +111,9 @@ class Product(CodeNameMixin):
 
 class Color(CodeNameMixin):
     image = models.URLField()
+
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         verbose_name = "Color"
@@ -102,6 +129,9 @@ class ProductVariant(models.Model):
         Product, related_name="variants", on_delete=models.CASCADE
     )
 
+    def __str__(self) -> str:
+        return self.product_variant_code
+
     class Meta:
         verbose_name = "Product Variant"
         verbose_name_plural = "Product Variants"
@@ -110,6 +140,9 @@ class ProductVariant(models.Model):
 class Size(models.Model):
     code = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         verbose_name = "Size"
@@ -121,11 +154,7 @@ class Nomenclature(models.Model):
     price = models.DecimalField(
         max_digits=8,
         decimal_places=2,
-        validators=[
-            MinValueValidator(
-                MinValueValidator(0, "The price must be equal or greater than 0.")
-            )
-        ],
+        validators=[MinValueValidator(0, "The price must be equal or greater than 0.")],
         default=0,
     )
     quantity = models.PositiveIntegerField(default=0)
@@ -136,6 +165,9 @@ class Nomenclature(models.Model):
         ProductVariant, related_name="nomenclatures", on_delete=models.CASCADE
     )
     ean = models.CharField(max_length=15, null=True)
+
+    def __str__(self) -> str:
+        return self.code
 
     class Meta:
         verbose_name = "Nomenclature"
@@ -148,3 +180,6 @@ class NomenclatureStock(models.Model):
     )
     quantity = models.PositiveIntegerField(default=0)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.nomenclature
