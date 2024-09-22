@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 
 from messages import denied_msg
-from conf import USER_ID, URI_MONGO
+from conf import URI_MONGO
 
 
 async def fetch_mongo_users(user_id):

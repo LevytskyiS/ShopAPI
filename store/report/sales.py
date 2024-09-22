@@ -1,4 +1,4 @@
-import asyncio
+import time
 
 import pandas as pd
 
@@ -6,19 +6,19 @@ from fetch import fetch_data
 from queries import QUERY_1
 
 
-async def clean_date(date):
+def clean_date(date):
     date = str(date).split(".")[0]
     date = date.split("+")[0]
     return date
 
 
 async def process_row(date):
-    return await clean_date(date)
+    return clean_date(date)
 
 
 async def process_dates(data: pd.DataFrame):
-    tasks = [process_row(date) for date in data["timestamp"]]
-    data["timestamp"] = await asyncio.gather(*tasks)
+    tasks = [await process_row(date) for date in data["timestamp"]]
+    data["timestamp"] = tasks
     return data
 
 
@@ -38,7 +38,8 @@ async def calculate_all_time_sales(pcs: int, turnover: int) -> str:
     return f"💴 CZK:\n{turnover:,.2f}\n\n💶 EUR:\n{eur_turnover:,.2f}\n\n🧩 Sold pieces:\n{pcs:,}"
 
 
-async def turnover_all_time(days=0):
+async def turnover_all_time(days=0) -> str:
+    s = time.time()
     sold_pieces = 0
     czk_turnover = 0
     emoji = "📊 "
@@ -47,6 +48,7 @@ async def turnover_all_time(days=0):
 
     data = await get_sales_info(QUERY_1)
     data = await process_dates(data)
+
     dates = data["timestamp"].unique()
     dates.sort()
     data["timestamp"] = pd.to_datetime(
@@ -106,4 +108,5 @@ async def turnover_all_time(days=0):
         czk_turnover += czk
 
     info: str = await calculate_all_time_sales(sold_pieces, czk_turnover)
+    print(f"Time taken: {round(time.time() - s, 2)}")
     return emoji + message_title + info
