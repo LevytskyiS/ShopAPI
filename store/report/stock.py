@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 
@@ -81,6 +83,13 @@ async def get_restock(db: str, item):
 
     if len(data) == 1:
         obj = data[0]
+        future_date = obj["stock"]
+
+        if future_date > datetime.today():
+            return f"👕 {obj['code']}\n\
+🧩 {obj['quantity']}\n\
+📅 {future_date.strftime('%d.%m.%Y')}\n\n"
+
         return f"👕 {obj['code']}:\n\
 🧩 {obj['quantity']}\n\n\
 ⭕️ No restock dates"

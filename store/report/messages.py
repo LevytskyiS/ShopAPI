@@ -9,7 +9,7 @@ help_msg = "\
 /start - Start the bot\n\
 /help - List of available commands\n\
 /desc - Bot description\n\
-/turnover - Turnover stats\n\
+/turnover - Sales stats\n\
 /product - Product information\n\
 /stock - Check stock availability\n\
 /restock - Check restock availability\n\n\
